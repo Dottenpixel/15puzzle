@@ -40,13 +40,13 @@
 		
 		_.addEventListener("mouseover", function(e){ 
 			var eligible = this.parentElement.childrenAry().filter(function(o, i){
-				o.setAttribute("class","cell")
-				var eligibleHorz = (o.offsetLeft == _.offsetLeft - _.offsetWidth 
-					|| o.offsetLeft == _.offsetLeft + _.offsetWidth)
-					&& (o.offsetTop == _.offsetTop);
-				var eligibleVert = (o.offsetTop == _.offsetTop - _.offsetHeight 
-					|| o.offsetTop == _.offsetTop + _.offsetHeight)
-					&& (o.offsetLeft == _.offsetLeft);
+				o.setAttribute("class","cell");
+				var eligibleHorz = (o.offsetLeft == _.X() - _.W() 
+					|| o.offsetLeft == _.X() + _.W())
+					&& (o.offsetTop == _.Y());
+				var eligibleVert = (o.offsetTop == _.Y() - _.H() 
+					|| o.offsetTop == _.Y() + _.H())
+					&& (o.offsetLeft == _.X());
 				return eligibleHorz || eligibleVert;
 			});
 			eligible.map( function(o){
@@ -54,12 +54,10 @@
 			})
 		});
 		
-		_.X = function(){
-			return _.offsetLeft;
-		};
-		_.Y = function(){
-			return _.offsetTop;
-		};
+		_.X = function(){ return _.offsetLeft; };
+		_.Y = function(){ return _.offsetTop; };
+		_.H = function(){ return _.offsetHeight; };
+		_.W = function(){ return _.offsetWidth; };
 	}
 	
 	var puz = new Puzzle(document.createElement("div"));
