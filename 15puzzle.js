@@ -1,17 +1,15 @@
 (function(){
-	function Puzzle() {
+	function Puzzle(el) {
 		this.cellsNum = 16;
-		
-		this._el = document.createElement("div");
-		this._el.setAttribute("class","puzzle");
-		
-		document.body.appendChild(this._el);
-		
-		for( i=0; i<16; i++ ) {
-			var cell = new Cell;
-			this._el.appendChild(cell._el);
-		}
-		
+				
+				
+		// for( i=0; i<16; i++ ) {
+		// 			var cell = new Cell;
+		// 			this.appendChild(cell._el);
+		// 		}
+		el.X = "101";
+		el.setAttribute("class","puzzle");
+		console.log(this);
 	}
 	
 	Puzzle.prototype.Spit = function() {
@@ -34,9 +32,14 @@
 		};
 	}
 	
-	var puz = new Puzzle;
+	var puz = document.createElement("div");
+	puz.prototype = new Puzzle(puz);
+		
+	document.body.appendChild(puz);
+	console.log(puz.X);
 	
-	console.log(puz.con);
-	puz.Spit();
+	
+	// console.log(puz.con);
+	// 	puz.Spit();
 	
 })(document)
