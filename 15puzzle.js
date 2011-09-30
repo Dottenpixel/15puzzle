@@ -25,8 +25,10 @@
 	function Puzzle(_) {
 		this.el = _;
 				
-		this.tileNums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
-
+		this.correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
+		this.randomTiles = this.correctTileOrder.sort(function() {return 0.5 - Math.random()})
+		
+		
 		_.setAttribute("class","puzzle");
 		
 		this.childrenAry = function() {
@@ -46,13 +48,13 @@
 			return arr;
 		}
 		
-		for( i=0; i<this.tileNums.length; i++ ) {
+		for( i=0; i<this.randomTiles.length; i++ ) {
 			var cell = new Cell(document.createElement("div"));
 			var tile = new Tile(document.createElement("div"));
-			if (this.tileNums[i]) {
-				tile.el.id = "tile"+this.tileNums[i];
-				tile.el.setAttribute("idx", this.tileNums[i]);
-				tile.el.appendChild(document.createTextNode(this.tileNums[i]));
+			if (this.randomTiles[i]) {
+				tile.el.id = "tile"+this.randomTiles[i];
+				tile.el.setAttribute("idx", this.randomTiles[i]);
+				tile.el.appendChild(document.createTextNode(this.randomTiles[i]));
 				cell.el.appendChild(tile.el);
 			}
 			_.appendChild(cell.el);
@@ -111,8 +113,8 @@
 			})[0];
 			if(blankCell) {
 				addClass(this, "draggable");
-				this.draggable = true;
 				if (e.type == "mouseover") return;
+				this.draggable = true;
 				var cancel = function(e) {
 					//console.log(e);
 					if (e.preventDefault) e.preventDefault();
