@@ -17,6 +17,11 @@
 		return el;
 	}
 	
+	function removeClass(el, selector) {
+		if (hasClass(el, selector)) el.setAttribute( "class", el.className.replace( selector, "") );
+		return el;
+	}
+	
 	function Puzzle(_) {
 		this.el = _;
 				
@@ -24,9 +29,9 @@
 
 		_.setAttribute("class","puzzle");
 		
-		_.childrenAry = function() {
+		this.childrenAry = function() {
 			arr=[];
-			for(var i=0,n; n=this.childNodes[i]; ++i) arr.push(n);
+			for(var i=0,n; n=this.el.childNodes[i]; ++i) arr.push(n);
 			return arr;
 		}
 		
@@ -34,6 +39,8 @@
 			var cell = new Cell(document.createElement("div"));
 			var tile = new Tile(document.createElement("div"));
 			if (this.tileNums[i]) {
+				tile.el.id = "tile"+this.tileNums[i];
+				tile.el.setAttribute("idx", this.tileNums[i]);
 				tile.el.appendChild(document.createTextNode(this.tileNums[i]));
 				cell.el.appendChild(tile.el);
 			}
@@ -57,7 +64,7 @@
 		});
 		
 		_.getEligibleCells = function(){
-			var eligible = _.parentElement.childrenAry().filter(function(o, i){
+			var eligible = puz.childrenAry().filter(function(o, i){
 				o.setAttribute("class","cell");
 				var eligibleHorz = (o.offsetLeft == _.X() - _.W() 
 					|| o.offsetLeft == _.X() + _.W())
@@ -81,6 +88,8 @@
 	
 	function Tile(_) {
 		this.el = _;
+		this.setIdx = function(v) { this._idx = v; }
+		this.getIdx = function() { return this._idx; }
 		
 		_.setAttribute("class","tile");
 		
@@ -91,6 +100,28 @@
 			if(blankCell) {
 				addClass(this, "draggable");
 				this.draggable = true;
+				var cancel = function(e) {
+					//console.log(e);
+					if (e.preventDefault) e.preventDefault();
+					return false;
+				}
+				var dropped = function(e){
+					console.log(e.type);
+					e.target.removeEventListener("drop", dropped);
+					var d = document.getElementById(e.dataTransfer.getData("Text"));
+					d.draggable = false;
+					removeClass(d, "draggable");
+					e.target.appendChild( d );
+				};
+				this.addEventListener("dragstart", function(e){ 
+					console.log("dragstart");
+					e.dataTransfer.setData("Text", this.id)
+				});
+				this.addEventListener("drag", function(e){ console.log("drag") });
+				this.addEventListener("dragend", function(e){ console.log("dragend") });
+				blankCell.addEventListener("dragover", cancel);
+				blankCell.addEventListener("dragenter", cancel);
+				blankCell.addEventListener("drop", dropped);
 			}
 		
 		});
