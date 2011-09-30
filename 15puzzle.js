@@ -35,6 +35,17 @@
 			return arr;
 		}
 		
+		this.arrangement = function() {
+			var arr = this.childrenAry().map(function(o,i){
+				if (o.hasChildNodes()) {
+					return o.firstChild.getAttribute("idx");
+				} else {
+					return false;
+				}
+			});
+			return arr;
+		}
+		
 		for( i=0; i<this.tileNums.length; i++ ) {
 			var cell = new Cell(document.createElement("div"));
 			var tile = new Tile(document.createElement("div"));
@@ -93,13 +104,15 @@
 		
 		_.setAttribute("class","tile");
 		
-		_.addEventListener("mouseover", function(e){ 
+		
+		this.mouseHandle = function(e){ 
 			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
 				return hasClass(o, "blank") ? true : false;
 			})[0];
 			if(blankCell) {
 				addClass(this, "draggable");
 				this.draggable = true;
+				if (e.type == "mouseover") return;
 				var cancel = function(e) {
 					//console.log(e);
 					if (e.preventDefault) e.preventDefault();
@@ -112,6 +125,8 @@
 					d.draggable = false;
 					removeClass(d, "draggable");
 					e.target.appendChild( d );
+					
+					console.log(puz.arrangement());
 				};
 				this.addEventListener("dragstart", function(e){ 
 					console.log("dragstart");
@@ -124,7 +139,10 @@
 				blankCell.addEventListener("drop", dropped);
 			}
 		
-		});
+		};
+		
+		_.addEventListener("mouseover", this.mouseHandle);
+		_.addEventListener("mousedown", this.mouseHandle);
 		
 	}
 	
