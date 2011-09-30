@@ -28,7 +28,6 @@
 		this.correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
 		this.randomTiles = this.correctTileOrder.sort(function() {return 0.5 - Math.random()})
 		
-		
 		_.setAttribute("class","puzzle");
 		
 		this.childrenAry = function() {
@@ -114,9 +113,8 @@
 			if(blankCell) {
 				addClass(this, "draggable");
 				if (e.type == "mouseover") return;
-				this.draggable = true;
+				e.target.draggable = true;
 				var cancel = function(e) {
-					//console.log(e);
 					if (e.preventDefault) e.preventDefault();
 					return false;
 				}
@@ -132,9 +130,12 @@
 				};
 				this.addEventListener("dragstart", function(e){ 
 					console.log("dragstart");
+					e.dataTransfer.effectAllowed = "move";
 					e.dataTransfer.setData("Text", this.id)
 				});
-				this.addEventListener("drag", function(e){ console.log("drag") });
+				this.addEventListener("drag", function(e){
+					console.log("drag");
+				});
 				this.addEventListener("dragend", function(e){ console.log("dragend") });
 				blankCell.addEventListener("dragover", cancel);
 				blankCell.addEventListener("dragenter", cancel);
@@ -151,10 +152,5 @@
 	var puz = new Puzzle(document.createElement("div"));
 		
 	document.body.appendChild(puz.el);
-	console.log(puz.Spit());
-	
-	
-	// console.log(puz.con);
-	// 	puz.Spit();
 	
 })(document)
