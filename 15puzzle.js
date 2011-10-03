@@ -7,6 +7,23 @@
 	    return a;
 	}
 	
+	Element.prototype.hasClassName = function(name) {
+	  return new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)").test(this.className);
+	};
+
+	Element.prototype.addClassName = function(name) {
+	  if (!this.hasClassName(name)) {
+	    this.className = this.className ? [this.className, name].join(' ') : name;
+	  }
+	};
+
+	Element.prototype.removeClassName = function(name) {
+	  if (this.hasClassName(name)) {
+	    var c = this.className;
+	    this.className = c.replace(new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)", "g"), "");
+	  }
+	};
+	
 	function hasClass(el, selector) {
 		var className = " " + selector + " ";
 		return (" " + el.className + " ").replace(/[\n\t]/g, " ").indexOf(className) > -1 ? true : false;
@@ -105,7 +122,6 @@
 		
 		_.setAttribute("class","tile");
 		
-		
 		this.mouseHandle = function(e){ 
 			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
 				return hasClass(o, "blank") ? true : false;
@@ -115,6 +131,7 @@
 				if (e.type == "mouseover") return;
 				e.target.draggable = true;
 				var cancel = function(e) {
+					//console.log(e.type);
 					if (e.preventDefault) e.preventDefault();
 					return false;
 				}
@@ -123,20 +140,48 @@
 					e.target.removeEventListener("drop", dropped);
 					var d = document.getElementById(e.dataTransfer.getData("Text"));
 					d.draggable = false;
+					d.style.left = "auto";
+					d.style.top = "auto";
+					removeClass(d, "dragging");
 					removeClass(d, "draggable");
 					e.target.appendChild( d );
 					
 					console.log(puz.arrangement());
 				};
+				var dragIcon = document.createElement('img');
+				dragIcon.src = '';
+				dragIcon.width = 100;
+				
 				this.addEventListener("dragstart", function(e){ 
 					console.log("dragstart");
 					e.dataTransfer.effectAllowed = "move";
-					e.dataTransfer.setData("Text", this.id)
+					
+					e.dataTransfer.setData("Text", this.id);
+					
+					e.dataTransfer.setDragImage(dragIcon, e.clientX, e.clientY);
+					console.log(e);
+					console.log(-e.clientX);
+					console.log(-e.clientY);
+					
 				});
 				this.addEventListener("drag", function(e){
 					console.log("drag");
+					e.srcElement.style.display = "none";
+					
+					document.getElementById("debug").innerHTML = e.srcElement.offsetX + ", " + e.srcElement.offsetY;
+					addClass(e.srcElement, "dragging");
+					e.srcElement.innerHTML = e.clientX + ", " + e.clientY;
+					e.srcElement.style.left = e.clientX + 0 + "px";
+					e.srcElement.style.top = e.clientY + 0 + "px";
+					e.srcElement.style.display = "block";
+					
+					//console.log(e.srcElement.style.display = none);
 				});
-				this.addEventListener("dragend", function(e){ console.log("dragend") });
+				
+				this.addEventListener("dragend", function(e){ 
+					console.log(e.type);
+					console.log(e);
+				});
 				blankCell.addEventListener("dragover", cancel);
 				blankCell.addEventListener("dragenter", cancel);
 				blankCell.addEventListener("drop", dropped);

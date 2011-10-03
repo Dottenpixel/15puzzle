@@ -31,13 +31,24 @@
 				height: 100%;
 				-webkit-user-select: none;
 				position: absolute;
+				z-index: 10;
 			}
 			.tile.draggable {
 				cursor: move;
 			}
+			.tile.dragging {
+				cursor: move;
+				position: fixed;
+			}
+			#debug {
+				position: fixed;
+				right: 0;
+				top: 0;
+			}
 		</style>
 	</head>
 	<body>
+		<textarea id="debug"></textarea>
 		<script src="15puzzle.js" type="text/javascript" charset="utf-8"></script>
 	</body>
 </html>
