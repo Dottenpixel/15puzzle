@@ -140,40 +140,36 @@
 					e.target.removeEventListener("drop", dropped);
 					var d = document.getElementById(e.dataTransfer.getData("Text"));
 					d.draggable = false;
-					d.style.left = "auto";
-					d.style.top = "auto";
-					removeClass(d, "dragging");
-					removeClass(d, "draggable");
+					// d.style.left = "auto";
+					// d.style.top = "auto";
 					e.target.appendChild( d );
 					
 					console.log(puz.arrangement());
 				};
-				var dragIcon = document.createElement('img');
-				dragIcon.src = '';
-				dragIcon.width = 100;
+				// var dragIcon = document.createElement('img');
+				// dragIcon.src = '';
+				// dragIcon.width = 100;
 				
 				this.addEventListener("dragstart", function(e){ 
-					console.log("dragstart");
+					console.log(e.type);
+					console.log(e);
+					
 					e.dataTransfer.effectAllowed = "move";
 					
 					e.dataTransfer.setData("Text", this.id);
 					
-					e.dataTransfer.setDragImage(dragIcon, e.clientX, e.clientY);
-					console.log(e);
-					console.log(-e.clientX);
-					console.log(-e.clientY);
-					
+					// e.dataTransfer.setDragImage(dragIcon, e.clientX, e.clientY);					
 				});
 				this.addEventListener("drag", function(e){
-					console.log("drag");
-					e.srcElement.style.display = "none";
-					
-					document.getElementById("debug").innerHTML = e.srcElement.offsetX + ", " + e.srcElement.offsetY;
+					console.log(e.type);
 					addClass(e.srcElement, "dragging");
-					e.srcElement.innerHTML = e.clientX + ", " + e.clientY;
-					e.srcElement.style.left = e.clientX + 0 + "px";
-					e.srcElement.style.top = e.clientY + 0 + "px";
-					e.srcElement.style.display = "block";
+					
+					// document.getElementById("debug").innerHTML = e.srcElement.offsetX + ", " + e.srcElement.offsetY;
+					// e.srcElement.innerHTML = e.clientX + ", " + e.clientY;
+					// e.srcElement.style.left = e.clientX + 0 + "px";
+					// e.srcElement.style.top = e.clientY + 0 + "px";
+					// e.srcElement.style.display = "none";					
+					// e.srcElement.style.display = "block";
 					
 					//console.log(e.srcElement.style.display = none);
 				});
@@ -181,6 +177,8 @@
 				this.addEventListener("dragend", function(e){ 
 					console.log(e.type);
 					console.log(e);
+					removeClass(e.target, "dragging");
+					removeClass(e.target, "draggable");
 				});
 				blankCell.addEventListener("dragover", cancel);
 				blankCell.addEventListener("dragenter", cancel);
