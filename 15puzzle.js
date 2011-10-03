@@ -122,7 +122,7 @@
 		
 		_.setAttribute("class","tile");
 		
-		this.mouseHandle = function(e){ 
+		this.mouseDrag = function(e){ 
 			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
 				return hasClass(o, "blank") ? true : false;
 			})[0];
@@ -186,9 +186,34 @@
 			}
 		
 		};
+		_.addEventListener("mousedown", this.mouseDrag);
+		_.addEventListener("mouseover", this.mouseDrag);
 		
-		_.addEventListener("mouseover", this.mouseHandle);
-		_.addEventListener("mousedown", this.mouseHandle);
+		this.mouseClick = function(e){
+			console.log(e.type);
+			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
+				return hasClass(o, "blank") ? true : false;
+			})[0];
+			if(blankCell){
+				console.log(blankCell.Y());
+				addClass(this, "animating")
+				e.target.style.left = blankCell.X() - this.parentElement.X() + "px";
+				e.target.style.top = blankCell.Y() - this.parentElement.Y() + "px";
+				
+				this.addEventListener("webkitTransitionEnd", function(e){ 
+					console.log(e.type);
+					e.target.style.left = "auto";
+					e.target.style.top = "auto";
+					
+					blankCell.appendChild( e.target );
+				});
+			} else {
+				return;
+			}
+			
+		};
+		
+		_.addEventListener("mouseup", this.mouseClick);
 		
 	}
 	
