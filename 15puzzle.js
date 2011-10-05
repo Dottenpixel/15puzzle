@@ -35,7 +35,7 @@
 	}
 	
 	function removeClass(el, selector) {
-		if (hasClass(el, selector)) el.setAttribute( "class", el.className.replace( selector, "") );
+		if (hasClass(el, selector)) el.setAttribute( "class", el.className.replace( selector, "").replace( /\s*$/, "") );
 		return el;
 	}
 	
@@ -122,6 +122,12 @@
 		
 		_.setAttribute("class","tile");
 		
+		var undraggable = function(el) {
+			el.draggable = false;
+			removeClass(el, "dragging");
+			removeClass(el, "draggable");
+		}
+		
 		this.mouseDrag = function(e){ 
 			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
 				return hasClass(o, "blank") ? true : false;
@@ -177,16 +183,18 @@
 				this.addEventListener("dragend", function(e){ 
 					console.log(e.type);
 					console.log(e);
-					removeClass(e.target, "dragging");
-					removeClass(e.target, "draggable");
+					undraggable(e.target);
 				});
 				blankCell.addEventListener("dragover", cancel);
 				blankCell.addEventListener("dragenter", cancel);
 				blankCell.addEventListener("drop", dropped);
+			} else {
+				undraggable(e.target);
 			}
 		
 		};
 		_.addEventListener("mousedown", this.mouseDrag);
+		_.addEventListener("mouseout", this.mouseDrag);
 		_.addEventListener("mouseover", this.mouseDrag);
 		
 		this.mouseClick = function(e){
@@ -196,7 +204,6 @@
 			})[0];
 			if(blankCell){
 				console.log(blankCell.Y());
-				addClass(this, "animating")
 				e.target.style.left = blankCell.X() - this.parentElement.X() + "px";
 				e.target.style.top = blankCell.Y() - this.parentElement.Y() + "px";
 				
