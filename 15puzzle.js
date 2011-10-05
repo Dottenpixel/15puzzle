@@ -64,6 +64,19 @@
 			return arr;
 		}
 		
+		this.getBlankCell = function() {
+			var b = puz.childrenAry().filter(function(o, i){
+				if (o.hasChildNodes()) {
+					removeClass(o,"blank");
+					return false;
+				} else { addClass(o,"blank");
+					addClass(o, "blank");
+					return true;
+				}
+			});
+			return b[0];
+		}
+		
 		for( i=0; i<this.randomTiles.length; i++ ) {
 			var cell = new Cell(document.createElement("div"));
 			var tile = new Tile(document.createElement("div"));
@@ -128,11 +141,28 @@
 			removeClass(el, "draggable");
 		}
 		
+		var dropped = function(e){
+			console.log(e.type);
+			console.log(e);
+			e.target.removeEventListener("drop", dropped, true);
+			
+			var d = document.getElementById(e.dataTransfer.getData("Text"));
+			undraggable(d);
+			// d.style.left = "auto";
+			// d.style.top = "auto";
+			console.log(e.target)
+			console.log(e.currentTarget)
+
+			if ( e.target === e.currentTarget ) e.target.appendChild( d );
+			
+			console.log(puz.arrangement());
+			return false;
+		};
+		
 		this.mouseDrag = function(e){ 
-			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
-				return hasClass(o, "blank") ? true : false;
-			})[0];
-			if(blankCell) {
+
+			if( hasClass(puz.getBlankCell(), "eligible") ) {
+				var blankCell = puz.getBlankCell();
 				addClass(this, "draggable");
 				if (e.type == "mouseover") return;
 				e.target.draggable = true;
@@ -141,17 +171,6 @@
 					if (e.preventDefault) e.preventDefault();
 					return false;
 				}
-				var dropped = function(e){
-					console.log(e.type);
-					e.target.removeEventListener("drop", dropped);
-					var d = document.getElementById(e.dataTransfer.getData("Text"));
-					d.draggable = false;
-					// d.style.left = "auto";
-					// d.style.top = "auto";
-					e.target.appendChild( d );
-					
-					console.log(puz.arrangement());
-				};
 				// var dragIcon = document.createElement('img');
 				// dragIcon.src = '';
 				// dragIcon.width = 100;
@@ -184,12 +203,16 @@
 					console.log(e.type);
 					console.log(e);
 					undraggable(e.target);
+					blankCell.removeEventListener("drop", dropped, true);
 				});
 				blankCell.addEventListener("dragover", cancel);
 				blankCell.addEventListener("dragenter", cancel);
-				blankCell.addEventListener("drop", dropped);
+				console.log("blankCell");
+				console.log(blankCell);
+				blankCell.addEventListener("drop", dropped, true);
 			} else {
 				undraggable(e.target);
+				puz.getBlankCell().removeEventListener("drop", dropped, true);
 			}
 		
 		};
@@ -199,10 +222,10 @@
 		
 		this.mouseClick = function(e){
 			console.log(e.type);
-			var blankCell = this.parentElement.getEligibleCells().filter(function(o, i){
-				return hasClass(o, "blank") ? true : false;
-			})[0];
-			if(blankCell){
+
+			if( hasClass(puz.getBlankCell(), "eligible") ) {
+				var blankCell = puz.getBlankCell();
+				blankCell.removeEventListener("drop", dropped, true);
 				console.log(blankCell.Y());
 				e.target.style.left = blankCell.X() - this.parentElement.X() + "px";
 				e.target.style.top = blankCell.Y() - this.parentElement.Y() + "px";
@@ -215,7 +238,7 @@
 					blankCell.appendChild( e.target );
 				});
 			} else {
-				return;
+				return false;
 			}
 			
 		};
