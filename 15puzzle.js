@@ -2,7 +2,7 @@
 	Array.prototype.map = function(fnc) {
 	    var a = new Array(this.length);
 	    for (var i = 0; i < this.length; i++) {
-	        a[i] = fnc(this[i]);
+	        a[i] = fnc(this[i], i);
 	    }
 	    return a;
 	}
@@ -47,6 +47,18 @@
 		
 		_.setAttribute("class","puzzle");
 		
+		this.getCell = function(idx) { return this.el.childNodes[idx]; }
+		
+		this.getCellByTileIdx = function(idx) {
+			var arr = this.childrenAry().map(function(o,i){
+				if ( o.hasChildNodes() && o.firstChild.getAttribute("idx") == idx) {
+					return o;
+				}
+			});
+			
+			return arr.sort().shift();
+		}
+		
 		this.childrenAry = function() {
 			arr=[];
 			for(var i=0,n; n=this.el.childNodes[i]; ++i) arr.push(n);
@@ -56,7 +68,7 @@
 		this.arrangement = function() {
 			var arr = this.childrenAry().map(function(o,i){
 				if (o.hasChildNodes()) {
-					return o.firstChild.getAttribute("idx");
+					return parseInt(o.firstChild.getAttribute("idx"));
 				} else {
 					return false;
 				}
@@ -78,7 +90,43 @@
 		}
 		
 		this.solve = function(e) {
+			//find least numbered tile for targeting
+			var correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
+			var solvedAry = correctTileOrder.map(function(o, i){ return o == puz.arrangement()[i] ? true : false; });
+			var unsolvedIdx = (function() {
+				for( var i=0; i < solvedAry.length; i++) {
+					console.log("solvedAry", i, solvedAry[i]);
+					if (solvedAry[i] == false) return i
+				};
+			})(solvedAry);
+
+			//find blank
+			console.log( puz.getBlankCell(), puz.getBlankCell().offsetLeft, puz.getBlankCell().offsetLeft );
+			var eligibles = puz.getBlankCell().getEligibleCells();
+			
+			console.log( puz.getCellByTileIdx(unsolvedIdx+1) );
+			var blankCell = puz.getBlankCell()
+			var targetCell = puz.getCellByTileIdx(unsolvedIdx+1);
+			var targetTile = targetCell.firstChild;
+			
+			var dist = [ (blankCell.X() - targetCell.X()), (blankCell.Y() - targetCell.Y())];
+			console.log(dist);
+			console.log(eligibles);
+			//find blank in relation to target
+			
+			
+			
+			//if target is below blank
+			//if target is above blank
+			//if target is left of blank
+			//if target is right of blank
+			//check if target is in place
 			console.log("solve");
+			
+			console.log("solvedAry", solvedAry);
+			console.log(correctTileOrder);
+			console.log(puz.arrangement());
+			
 		}
 		
 		for( i=0; i<this.randomTiles.length; i++ ) {
