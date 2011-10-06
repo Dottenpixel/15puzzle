@@ -77,6 +77,10 @@
 			return b[0];
 		}
 		
+		this.solve = function(e) {
+			console.log("solve");
+		}
+		
 		for( i=0; i<this.randomTiles.length; i++ ) {
 			var cell = new Cell(document.createElement("div"));
 			var tile = new Tile(document.createElement("div"));
@@ -93,7 +97,7 @@
 	}
 	
 	Puzzle.prototype.Spit = function() {
-		console.log( this.el.offsetWidth )
+		console.log( this.el.offsetWidth );
 	}
 	
 	function Cell(_) {
@@ -158,6 +162,17 @@
 			console.log(puz.arrangement());
 			return false;
 		};
+		
+		var animEnd = function(e) { 
+			console.log(e.type);
+			e.target.removeEventListener("webkitTransitionEnd", animEnd);
+			
+			e.target.style.left = "auto";
+			e.target.style.top = "auto";
+			
+			puz.getBlankCell().appendChild( e.target );
+			console.log(puz.arrangement());
+		}
 		
 		this.mouseDrag = function(e){
 			console.log(e.type);
@@ -233,14 +248,7 @@
 				e.target.style.left = blankCell.X() - this.parentElement.X() + "px";
 				e.target.style.top = blankCell.Y() - this.parentElement.Y() + "px";
 				
-				this.addEventListener("webkitTransitionEnd", function(e){ 
-					console.log(e.type);
-					e.target.style.left = "auto";
-					e.target.style.top = "auto";
-					
-					blankCell.appendChild( e.target );
-					console.log(puz.arrangement());
-				});
+				this.addEventListener("webkitTransitionEnd", animEnd);
 			} else {
 				return false;
 			}
@@ -252,7 +260,7 @@
 	}
 	
 	var puz = new Puzzle(document.createElement("div"));
-		
+	document.getElementById("btn_solve").addEventListener("mouseup", puz.solve);
 	document.body.appendChild(puz.el);
 	
 })(document)
