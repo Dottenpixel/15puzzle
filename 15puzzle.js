@@ -159,13 +159,16 @@
 			return false;
 		};
 		
-		this.mouseDrag = function(e){ 
-
+		this.mouseDrag = function(e){
+			console.log(e.type);
+			if (e.type == "mouseout") return;
+			e.target.parentNode.getEligibleCells();
+			
 			if( hasClass(puz.getBlankCell(), "eligible") ) {
 				var blankCell = puz.getBlankCell();
 				addClass(this, "draggable");
-				if (e.type == "mouseover") return;
 				e.target.draggable = true;
+				if (e.type == "mouseover") return;
 				var cancel = function(e) {
 					//console.log(e.type);
 					if (e.preventDefault) e.preventDefault();
@@ -236,6 +239,7 @@
 					e.target.style.top = "auto";
 					
 					blankCell.appendChild( e.target );
+					console.log(puz.arrangement());
 				});
 			} else {
 				return false;
