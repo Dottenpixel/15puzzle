@@ -89,7 +89,35 @@
 			return b[0];
 		}
 		
+		this.isSolved = function() { return this.correctTileOrder == this.arrangement() ? true : false; }
+		
+		this.stopSolve = function() {
+			_.removeEventListener("solve", puz.solve);
+		}
+		
+		var animEnd = function(e) { 
+			console.log(e.type);
+			e.target.removeEventListener("webkitTransitionEnd", animEnd);
+			
+			e.target.style.left = "auto";
+			e.target.style.top = "auto";
+			
+			puz.getBlankCell().appendChild( e.target );
+			console.log("puz", puz.arrangement());
+			
+			
+			if( !puz.isSolved() ) {
+				console.log(this, e.target, "not solved");
+				_.addEventListener("solve", puz.solve);
+				var e = document.createEvent("Event");
+				e.initEvent("solve", true, true);
+				var fireEvent = function(){ _.dispatchEvent(e); }
+				var wait = setTimeout(fireEvent, 1000);
+			}
+		}
+		
 		this.solve = function(e) {
+			e.target.removeEventListener("solve", puz.solve);
 			//find least numbered tile for targeting
 			var correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
 			var solvedAry = correctTileOrder.map(function(o, i){ return o == puz.arrangement()[i] ? true : false; });
@@ -112,6 +140,11 @@
 			var dist = [ (blankCell.X() - targetCell.X()), (blankCell.Y() - targetCell.Y())];
 			console.log(dist);
 			console.log(eligibles);
+			
+			targetTile.style.left = blankCell.X() - targetCell.X() + "px";
+			targetTile.style.top = blankCell.Y() - targetCell.Y() + "px";
+			
+			targetTile.addEventListener("webkitTransitionEnd", animEnd);
 			//find blank in relation to target
 			
 			
@@ -211,17 +244,6 @@
 			return false;
 		};
 		
-		var animEnd = function(e) { 
-			console.log(e.type);
-			e.target.removeEventListener("webkitTransitionEnd", animEnd);
-			
-			e.target.style.left = "auto";
-			e.target.style.top = "auto";
-			
-			puz.getBlankCell().appendChild( e.target );
-			console.log(puz.arrangement());
-		}
-		
 		this.mouseDrag = function(e){
 			console.log(e.type);
 			if (e.type == "mouseout") return;
@@ -285,14 +307,24 @@
 		_.addEventListener("mousedown", this.mouseDrag);
 		_.addEventListener("mouseout", this.mouseDrag);
 		_.addEventListener("mouseover", this.mouseDrag);
-		
+
+		var animEnd = function(e) { 
+			console.log(e.type);
+			e.target.removeEventListener("webkitTransitionEnd", animEnd);
+			
+			e.target.style.left = "auto";
+			e.target.style.top = "auto";
+			
+			puz.getBlankCell().appendChild( e.target );
+			console.log(puz.arrangement());
+		}
+				
 		this.mouseClick = function(e){
 			console.log(e.type);
 
 			if( hasClass(puz.getBlankCell(), "eligible") ) {
 				var blankCell = puz.getBlankCell();
 				blankCell.removeEventListener("drop", dropped, true);
-				console.log(blankCell.Y());
 				e.target.style.left = blankCell.X() - this.parentElement.X() + "px";
 				e.target.style.top = blankCell.Y() - this.parentElement.Y() + "px";
 				
@@ -308,6 +340,7 @@
 	}
 	
 	var puz = new Puzzle(document.createElement("div"));
+	document.getElementById("btn_stopsolve").addEventListener("mouseup", puz.stopSolve);
 	document.getElementById("btn_solve").addEventListener("mouseup", puz.solve);
 	document.body.appendChild(puz.el);
 	
