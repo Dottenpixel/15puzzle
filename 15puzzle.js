@@ -154,24 +154,66 @@
 				
 			};
 			
-			//if target is below blank
+			//if mTile is below blank
 			console.log(distObj);
 			console.log(eligibles);
+			elObjAry = eligibles.map(function(o,i) {
+				var goalCellIdx = parseInt(o.firstChild.getAttribute("idx")) - 1;
+				console.log("goalCellIdx", goalCellIdx);
+				var goalCell = $puz.getCell(goalCellIdx)
+				console.log("goalCell", goalCell);
+				var distX = Math.abs(goalCell.X() - o.X());
+				var distY = Math.abs(goalCell.Y() - o.Y());
+				var totalDist = distX + distY;				
+				console.log(o, totalDist);
+				return { el: o, dist: totalDist, idx: parseInt(o.firstChild.getAttribute("idx")) }
+			});
 			
-			//if target is above blank
-			if(distObj.x < 0 || distObj.y < 0) {
-				mCell = eligibles[eligibles.length-1];
-				mTile = mCell.firstChild;
-				mTile.style.left = blankCell.X() - mCell.X() + "px";
-				mTile.style.top = blankCell.Y() - mCell.Y() + "px";
-			}
-			else if (distObj.x > 0 || distObj.y > 0) {
-				mCell = eligibles[0];
-				mTile = mCell.firstChild;
-				mTile.style.left = blankCell.X() - mCell.X() + "px";
-				mTile.style.top = blankCell.Y() - mCell.Y() + "px";
-			}
-			console.log("mCell", mCell);
+			//whatever has the longest distance to travel
+			elObjAry.sort(function (a, b) { 
+				console.log(a,b);
+				if (a.dist === b.dist) {
+					return a.idx - b.idx;
+					//return a.idx < b.idx ? -1 : a.idx > b.idx ? 1 : 0;
+				}
+				return a.dist - b.dist;
+				
+			});
+			var filElObjAry = elObjAry.filter(function(o, i){ return o.dist != 0 });
+			console.log(filElObjAry);
+			mCell = filElObjAry[0].el;
+			mTile = mCell.firstChild;
+			console.log(mTile);
+			
+			//move tile
+			mTile.style.left = blankCell.X() - mCell.X() + "px";
+			mTile.style.top = blankCell.Y() - mCell.Y() + "px";
+			
+			mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
+			
+			// //if mTile is above blank
+			// if(distObj.x < 0 || distObj.y < 0) {
+			// 	console.log("Rule #1");
+			// 	mCell = eligibles[eligibles.length-1];
+			// 	mTile = mCell.firstChild;
+			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
+			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
+			// }
+			// else if (distObj.x > 0 || distObj.y > 0) {
+			// 	console.log("Rule #2");
+			// 	mCell = eligibles[0];
+			// 	mTile = mCell.firstChild;
+			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
+			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
+			// }
+			// else if ((distObj.x > 0 || distObj.y >= 0) && curTargetTileCell.hasClass("eligible")) {
+			// 	console.log("Rule #3");
+			// 	mCell = eligibles[1];
+			// 	mTile = mCell.firstChild;
+			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
+			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
+			// }
+			//console.log("mCell", mCell);
 			//if target is left of blank
 			//if target is right of blank
 
@@ -179,7 +221,7 @@
 			//targetTile.style.left = blankCell.X() - curTargetTileCell.X() + "px";
 			//targetTile.style.top = blankCell.Y() - curTargetTileCell.Y() + "px";
 			
-			mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
+			//mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
 			
 			//check if target is in place
 			console.log("solve");
