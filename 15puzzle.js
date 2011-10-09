@@ -145,6 +145,7 @@
 			var curTargetCell  = $puz.cellAry()[unsolvedIdx];
 			var curTargetTileCell = $puz.getCellByTileIdx(unsolvedIdx+1);
 			var mCell;
+			var mTile;
 			var targetTile = curTargetTileCell.firstChild;
 			console.log("curTargetCell", curTargetCell);
 			//find blank in relation to target
@@ -160,13 +161,15 @@
 			//if target is above blank
 			if(distObj.x < 0 || distObj.y < 0) {
 				mCell = eligibles[eligibles.length-1];
-				mCell.firstChild.style.left = blankCell.X() - mCell.X() + "px";
-				mCell.firstChild.style.top = blankCell.Y() - mCell.Y() + "px";
+				mTile = mCell.firstChild;
+				mTile.style.left = blankCell.X() - mCell.X() + "px";
+				mTile.style.top = blankCell.Y() - mCell.Y() + "px";
 			}
 			else if (distObj.x > 0 || distObj.y > 0) {
 				mCell = eligibles[0];
-				mCell.firstChild.style.left = blankCell.X() - mCell.X() + "px";
-				mCell.firstChild.style.top = blankCell.Y() - mCell.Y() + "px";
+				mTile = mCell.firstChild;
+				mTile.style.left = blankCell.X() - mCell.X() + "px";
+				mTile.style.top = blankCell.Y() - mCell.Y() + "px";
 			}
 			console.log("mCell", mCell);
 			//if target is left of blank
@@ -176,7 +179,7 @@
 			//targetTile.style.left = blankCell.X() - curTargetTileCell.X() + "px";
 			//targetTile.style.top = blankCell.Y() - curTargetTileCell.Y() + "px";
 			
-			mCell.firstChild.addEventListener("webkitTransitionEnd", $puz.animEnd);
+			mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
 			
 			//check if target is in place
 			console.log("solve");
