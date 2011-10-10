@@ -42,9 +42,12 @@
 	function Puzzle(_) {
 		this.el = _;
 		var $puz = this;
-				
+		
+		this.debug = function(txt) { document.getElementById("debug").innerHTML = txt; }
+		//Provided Array = [4, 8, 1, 14, 7, 2, 3, 0, 12, 5, 6, 11, 13, 9, 15]
 		this.correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
 		this.randomTiles = this.correctTileOrder.sort(function() {return 0.5 - Math.random()})
+		this.randomTiles = [1, 2, 8, 14, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
 		
 		_.setAttribute("class","puzzle");
 				
@@ -70,7 +73,25 @@
 			arr.filter(function(o,i){ return o ? true : false }); 
 			return arr;
 		}
-
+		this.moveLog = [];
+		
+		this.addMove = function(idx) { this.moveLog.push(idx) };
+		
+		this.moveCheck = function() { 
+			var ml = this.moveLog.join(",");
+			var sample = this.moveLog.slice(this.moveLog.length-3);
+			var sampleRE = new RegExp(sample, "g");
+			var captures = ml.match(sampleRE);
+			console.log( "moveCheck", sample, captures, captures.length > 2, ml );
+			if (captures.length > 2) {
+				//alert("LOOP!");
+				//this.moveLog = [];
+				return true;
+			}
+			return false;
+		};
+			
+		
 		this.clearMoves = function() {
 			var arr = $puz.getTiles().map(function(o,i){
 				// console.log("__im a tile", o);
@@ -114,6 +135,7 @@
 			});
 		}
 		this.stopSolve = function(e) {
+			removeClass( $puz.el, "solving")
 			_.removeEventListener("solve", $puz.solve);
 		}
 		
@@ -128,32 +150,36 @@
 			console.log("puz", $puz.arrangement());
 			// $puz.getBlankCell().getEligibleCells();
 			
+			$puz.addMove(e.target.getAttribute("idx"));
 			$puz.clearMoves();
 			addClass(e.target, "lastMove");
 			
 			if( !$puz.isSolved() ) {
 				console.log(this, e.target, "not solved");
-				// _.addEventListener("solve", $puz.solve);
-				// var e = document.createEvent("Event");
-				// e.initEvent("solve", true, true);
-				// var fireEvent = function(){ _.dispatchEvent(e); }
-				// var wait = setTimeout(fireEvent, 1000);
+				// run the solve function again if not solved
+				_.addEventListener("solve", $puz.solve);
+				var e = document.createEvent("Event");
+				e.initEvent("solve", true, true);
+				var fireEvent = function(){ _.dispatchEvent(e); }
+				var wait = setTimeout(fireEvent, 100);
 			}
 		}
 		
 		this.solve = function(e) {
+			//console.log = function(s) { return null; }
+			addClass( $puz.el, "solving")
 			e.target.removeEventListener("solve", $puz.solve);
 			//find least numbered tile for targeting
 			var correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
 			var solvedAry = correctTileOrder.map(function(o, i){ return o == $puz.arrangement()[i] ? true : false; });
 			var unsolvedIdx = (function() {
 				for( var i=0; i < solvedAry.length; i++) {
-					console.log("solvedAry", i, solvedAry[i]);
+					console.log("solvedAry", i, solvedAry[i], solvedAry);
 					if (solvedAry[i] == false) return i
 				};
 			})(solvedAry);
 			console.log("unsolvedIdx", unsolvedIdx);
-
+			
 			//find blank
 			console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
 			var eligibles = $puz.getBlankCell().getEligibleCells();
@@ -162,10 +188,12 @@
 			var blankCell = $puz.getBlankCell();
 			var curTargetCell  = $puz.getCells()[unsolvedIdx];
 			var curTargetTileCell = $puz.getCellByTileIdx(unsolvedIdx+1);
+
 			var mCell;
 			var mTile;
 			var targetTile = curTargetTileCell.firstChild;
 			console.log("curTargetCell", curTargetCell);
+			console.log("curTargetTileCell", curTargetTileCell);
 			//find blank in relation to target
 			var distObj = { x: (blankCell.X() - curTargetTileCell.X()), y: (blankCell.Y() - curTargetTileCell.Y()), goalCellX: curTargetCell.X(), goalCellY: curTargetCell.Y() };
 			var nextEligibleCell = function(el,dir) {
@@ -186,7 +214,9 @@
 				console.log(o, totalDist);
 				return { 
 					el: o,
-					dist: totalDist, 
+					dist: totalDist,
+					distFromTarget: Math.abs(curTargetTileCell.X() - o.X()) + Math.abs(curTargetTileCell.Y() - o.Y()),
+					diagDiff:  Math.abs(distX - distY),
 					idx: goalCellIdx + 1, 
 					solved: goalCellIdx < unsolvedIdx
 				}
@@ -196,7 +226,12 @@
 				console.log(a,b);
 				//if two tiles has the same distance to travel
 				if (a.dist === b.dist) {
-					return a.idx - b.idx;
+					if (a.diagDiff === b.diagDiff) {
+						//return a.idx - b.idx;
+						return a.distFromTarget - b.distFromTarget;
+					} else {
+						return a.diagDiff - b.diagDiff;
+					}
 					//return a.idx < b.idx ? -1 : a.idx > b.idx ? 1 : 0;
 				}
 				//whatever has the longest distance to travel
@@ -205,6 +240,8 @@
 			});
 			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && !o.solved; });
 			console.log("filElObjAry", filElObjAry);
+			$puz.moveCheck();
+			if( $puz.moveCheck() && filElObjAry.length > 1 ) filElObjAry = filElObjAry.slice(1);
 			mCell = filElObjAry[0].el;
 			mTile = mCell.firstChild;
 			console.log(mTile);
@@ -273,10 +310,7 @@
 		//console.log(this);
 		this.init();
 	}
-	
-	Puzzle.prototype.Spit = function() {
-		console.log( this.el.offsetWidth );
-	}
+
 	
 	function Cell(_) {
 		this.el = _;
