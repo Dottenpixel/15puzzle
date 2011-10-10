@@ -145,7 +145,7 @@
 			return false;
 		 }
 		this.reset = function(e) {
-			$puz.el.removeChild(document.getElementById("puzBanner"));
+			if (document.getElementById("puzBanner")) $puz.el.removeChild(document.getElementById("puzBanner"));
 			$puz.getCells().map(function(o,i){
 				if($puz.randomTiles[i]) {
 					var t = document.getElementById("tile"+$puz.randomTiles[i]);
