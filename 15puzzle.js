@@ -45,10 +45,10 @@
 		
 		this.debug = function(txt) { document.getElementById("debug").innerHTML = txt; }
 		//Provided Array = [4, 8, 1, 14, 7, 2, 3, 0, 12, 5, 6, 11, 13, 9, 15]
-		this.correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
-		this.randomTiles = this.correctTileOrder.sort(function() {return 0.5 - Math.random()})
-		this.randomTiles = [1, 2, 14, 8, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
-		
+		this.correctTileOrder = function() { return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false]; }
+		this.randomTiles = this.correctTileOrder().sort(function() {return 0.5 - Math.random()})
+		//this.randomTiles = [1, 2, 14, 8, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
+		console.log($puz.correctTileOrder());
 		_.setAttribute("class","puzzle");
 				
 		this.getCellByTileIdx = function(idx) {
@@ -125,7 +125,10 @@
 			return b[0];
 		}
 		
-		this.isSolved = function() { return this.correctTileOrder == this.arrangement() ? true : false; }
+		this.isSolved = function() { 
+			console.log( this.correctTileOrder(), this.arrangement() );
+			return this.correctTileOrder() == this.arrangement();
+		 }
 		this.reset = function(e) { 
 			$puz.getCells().map(function(o,i){
 				if($puz.randomTiles[i]) {
@@ -147,7 +150,7 @@
 			e.target.style.top = "auto";
 			
 			$puz.getBlankCell().appendChild( e.target );
-			//--console.log("puz", $puz.arrangement());
+			//console.log("puz", $puz.arrangement());
 			// $puz.getBlankCell().getEligibleCells();
 			
 			$puz.addMove(e.target.getAttribute("idx"));
@@ -162,6 +165,8 @@
 				e.initEvent("solve", true, true);
 				var fireEvent = function(){ _.dispatchEvent(e); }
 				var wait = setTimeout(fireEvent, 50);
+			} else {
+				alert("Solved!");
 			}
 		}
 		
@@ -170,14 +175,24 @@
 			addClass( $puz.el, "solving")
 			e.target.removeEventListener("solve", $puz.solve);
 			//find least numbered tile for targeting
-			var correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
-			var solvedAry = correctTileOrder.map(function(o, i){ return o == $puz.arrangement()[i] ? true : false; });
+			var solvedAry = $puz.correctTileOrder().map(function(o, i){ return o == $puz.arrangement()[i] ? true : false; });
 			var unsolvedIdx = (function() {
 				for( var i=0; i < solvedAry.length; i++) {
 					//--console.log("solvedAry", i, solvedAry[i], solvedAry);
 					if (solvedAry[i] == false) return i
 					
 					//accounting for trick around corners
+					if (i == 9) {
+						$puz.clearMoves();
+						
+						if (solvedAry[i] == true && solvedAry[i+3] == true) {
+							return i+1;
+						}
+						if (solvedAry[i] == true && solvedAry[i+3] == false) {
+							solvedAry[i] = false;
+							return i;
+						}
+					}
 					if (i == 2 || i == 6) {
 						if (solvedAry[i] == true && solvedAry[i+1] == false) {
 							solvedAry[i] = false;
@@ -219,6 +234,7 @@
 				//--console.log("goalCell", goalCell);
 				var distX = Math.abs(goalCell.X() - o.X());
 				var distY = Math.abs(goalCell.Y() - o.Y());
+				//var distBonus = distX == 0 || distY == 0 ? .1 : 0;
 				var totalDist = distX + distY;				
 				//--console.log(o, totalDist);
 				return { 
@@ -265,7 +281,7 @@
 			//--console.log("solve");
 			
 			//--console.log("solvedAry", solvedAry);
-			//--console.log(correctTileOrder);
+			//--console.log($puz.correctTileOrder());
 			//--console.log($puz.arrangement());
 			
 		}
