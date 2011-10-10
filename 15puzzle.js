@@ -47,7 +47,7 @@
 		//Provided Array = [4, 8, 1, 14, 7, 2, 3, 0, 12, 5, 6, 11, 13, 9, 15]
 		this.correctTileOrder = function() { return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false]; }
 		this.randomTiles = this.correctTileOrder().sort(function() {return 0.5 - Math.random()})
-		this.randomTiles = [4, 8, 1, 14, 7, 2, 3, 10, false, 12, 5, 6, 11, 13, 9, 15];
+		//this.randomTiles = [4, 8, 1, 14, 7, 2, 3, false, 10, 12, 5, 6, 11, 13, 9, 15];
 		//--console.log($puz.correctTileOrder());
 		_.setAttribute("class","puzzle");
 				
