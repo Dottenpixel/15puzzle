@@ -5,42 +5,59 @@
 		<title>15puzzle</title>
 		<style type="text/css" media="screen">
 			.puzzle {
-				width: 400px;
-				height: 400px;
-				border: 1px solid #333;
+				width: 640px;
+				height: 640px;
 				position: relative;
 			}
 			.cell {
 				width: 25%;
 				height: 25%;
 				float: left;
-				border: 1px solid #999;
-				background: #ccc;
+				background-color: #ccc;
 				box-sizing: border-box;
 				position: relative;
 			}
 			.cell:hover {
-				background: #f99;
+				background-color: #f99;
 			}
 			.cell.eligible {
-				background: #ff9;
+				background-color: #ff9;
 			}
 			.cell.eligible .tile {
-				background: #9f9;
+				background-color: #9f9;
 			}
 			.tile {
-				background: #9ff;
+				background: #9ff url(lion.png) no-repeat top left;
 				width: 100%;
 				height: 100%;
+				padding: 8px;
+				box-sizing: border-box;
+				
 				-webkit-user-select: none;
 				position: absolute;
 				z-index: 10;
-				color: #000;
+				color: #fff;
 				font-family: Arial;
 				-webkit-transition-property: left, top, background;
 				-webkit-transition-duration: .33s;
 				-webkit-transition-timing-function: ease-in;
 			}
+			#tile1 { background-position: 0% 0%; }
+			#tile2 { background-position: 33% 0%; }
+			#tile3 { background-position: 66% 0%; }
+			#tile4 { background-position: 100% 0%; }
+			#tile5 { background-position: 0% 33%; }
+			#tile6 { background-position: 33% 33%; }
+			#tile7 { background-position: 66% 33%; }
+			#tile8 { background-position: 100% 33%; }
+			#tile9 { background-position: 0% 66%; }
+			#tile10 { background-position: 33% 66%; }
+			#tile11 { background-position: 66% 66%; }
+			#tile12 { background-position: 100% 66%; }
+			#tile13 { background-position: 0% 100%; }
+			#tile14 { background-position: 33% 100%; }
+			#tile15 { background-position: 66% 100%; }
+			
 			.solving .tile {
 				-webkit-transition-duration: .1s;
 			}
@@ -50,26 +67,33 @@
 			}
 			.tile.dragging {
 				cursor: move;
-				background: #333;
+				background-color: #333;
 			}
 			input[type="button"] {
-				zoom: 3.0;
-				float: right;
+				zoom: 2.0;
+				display: block;
 				margin: 20px 8px;
 			}
 			#debug {
 				position: fixed;
 				right: 0;
 				bottom: 0;
-				width: 50%;
+				width: 40%;
+			}
+			#button_area {
+				position: fixed;
+				right: 0;
+				top: 0;
 			}
 		</style>
 	</head>
 	<body>
 		<textarea id="debug"></textarea>
-		<input type="button" id="btn_solve" value="Solve" />
-		<input type="button" id="btn_stopsolve" value="Stop Solve" />
-		<input type="button" id="btn_reset" value="Reset" />
+		<fieldset id="button_area">
+			<input type="button" id="btn_solve" value="Solve" />
+			<input type="button" id="btn_stopsolve" value="Stop Solve" />
+			<input type="button" id="btn_reset" value="Reset" />
+		</fieldset>
 		<script src="15puzzle.js" type="text/javascript" charset="utf-8"></script>
 	</body>
 </html>
