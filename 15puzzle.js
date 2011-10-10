@@ -48,7 +48,7 @@
 		this.correctTileOrder = function() { return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false]; }
 		this.randomTiles = this.correctTileOrder().sort(function() {return 0.5 - Math.random()})
 		//this.randomTiles = [1, 2, 14, 8, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
-		console.log($puz.correctTileOrder());
+		//--console.log($puz.correctTileOrder());
 		_.setAttribute("class","puzzle");
 				
 		this.getCellByTileIdx = function(idx) {
@@ -75,9 +75,9 @@
 		}
 		this.moveLog = [];
 		
-		this.addMove = function(idx) { this.moveLog.push(idx) };
+		this.addMove = function(idx) { this.moveLog.push(idx); };
 		
-		this.moveCheck = function() { 
+		this.moveCheck = function() {
 			var ml = this.moveLog.join(",");
 			var sample = this.moveLog.slice(this.moveLog.length-3);
 			var sampleRE = new RegExp(sample, "g");
@@ -126,7 +126,7 @@
 		}
 		
 		this.isSolved = function() { 
-			console.log( this.correctTileOrder(), this.arrangement() );
+			//--console.log( this.correctTileOrder(), this.arrangement() );
 			return this.correctTileOrder() == this.arrangement();
 		 }
 		this.reset = function(e) { 
@@ -201,7 +201,7 @@
 					}
 				};
 			})(solvedAry);
-			console.log("unsolvedIdx", unsolvedIdx);
+			//--console.log("unsolvedIdx", unsolvedIdx);
 			
 			//find blank
 			//--console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
@@ -221,8 +221,8 @@
 			var mCell;
 			var mTile;
 			var targetTile = curTargetTileCell.firstChild;
-			console.log("curTargetCell", curTargetCell);
-			console.log("curTargetTileCell", curTargetTileCell);
+			//--console.log("curTargetCell", curTargetCell);
+			//--console.log("curTargetTileCell", curTargetTileCell);
 			//find blank in relation to target
 			
 			//if mTile is below blank
@@ -235,7 +235,7 @@
 				var distX = Math.abs(goalCell.X() - o.X());
 				var distY = Math.abs(goalCell.Y() - o.Y());
 				//var distBonus = distX == 0 || distY == 0 ? .1 : 0;
-				var totalDist = distX + distY;				
+				var totalDist = distX + distY; // + distBonus;				
 				//--console.log(o, totalDist);
 				return { 
 					el: o,
@@ -264,7 +264,7 @@
 				
 			});
 			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && !o.solved; });
-			console.log("filElObjAry", filElObjAry);
+			//--console.log("filElObjAry", filElObjAry);
 			$puz.moveCheck();
 			if( $puz.moveCheck() && filElObjAry.length > 1 ) filElObjAry = filElObjAry.slice(1);
 			mCell = filElObjAry[0].el;
@@ -363,6 +363,7 @@
 			//--console.log(e.currentTarget)
 
 			if ( e.target === e.currentTarget ) e.target.appendChild( d );
+			puz.addMove();
 			
 			//--console.log(puz.arrangement());
 			return false;
@@ -442,6 +443,7 @@
 			e.target.style.top = "auto";
 			
 			puz.getBlankCell().appendChild( e.target );
+			puz.addMove();
 			//--console.log(puz.arrangement());
 		}
 				
