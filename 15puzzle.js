@@ -152,6 +152,7 @@
 					if (solvedAry[i] == false) return i
 				};
 			})(solvedAry);
+			console.log("unsolvedIdx", unsolvedIdx);
 
 			//find blank
 			console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
@@ -183,20 +184,26 @@
 				var distY = Math.abs(goalCell.Y() - o.Y());
 				var totalDist = distX + distY;				
 				console.log(o, totalDist);
-				return { el: o, dist: totalDist, idx: parseInt(o.firstChild.getAttribute("idx")) }
+				return { 
+					el: o,
+					dist: totalDist, 
+					idx: goalCellIdx + 1, 
+					solved: goalCellIdx < unsolvedIdx
+				}
 			});
 			
-			//whatever has the longest distance to travel
 			elObjAry.sort(function (a, b) { 
 				console.log(a,b);
+				//if two tiles has the same distance to travel
 				if (a.dist === b.dist) {
 					return a.idx - b.idx;
 					//return a.idx < b.idx ? -1 : a.idx > b.idx ? 1 : 0;
 				}
-				return a.dist - b.dist;
+				//whatever has the longest distance to travel
+				return b.dist - a.dist;
 				
 			});
-			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && o.dist != 0; });
+			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && !o.solved; });
 			console.log("filElObjAry", filElObjAry);
 			mCell = filElObjAry[0].el;
 			mTile = mCell.firstChild;
