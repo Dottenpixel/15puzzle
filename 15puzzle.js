@@ -47,11 +47,9 @@
 		this.randomTiles = this.correctTileOrder.sort(function() {return 0.5 - Math.random()})
 		
 		_.setAttribute("class","puzzle");
-		
-		this.getCell = function(idx) { return this.el.childNodes[idx]; }
-		
+				
 		this.getCellByTileIdx = function(idx) {
-			var arr = this.cellAry().map(function(o,i){
+			var arr = this.getCells().map(function(o,i){
 				if ( o.hasChildNodes() && o.firstChild.getAttribute("idx") == idx) {
 					return o;
 				}
@@ -59,15 +57,31 @@
 			
 			return arr.sort().shift();
 		}
-		
-		this.cellAry = function() {
+		this.getCell = function(idx) { return this.el.childNodes[idx]; }
+
+		this.getCells = function() {
 			arr=[];
 			for(var i=0,n; n=this.el.childNodes[i]; ++i) arr.push(n);
 			return arr;
 		}
+
+		this.getTiles = function() {
+			var arr = $puz.getCells().map(function(o,i){ return o.hasChildNodes() ? o.firstChild : false; });
+			arr.filter(function(o,i){ return o ? true : false }); 
+			return arr;
+		}
+
+		this.clearMoves = function() {
+			var arr = $puz.getTiles().map(function(o,i){
+				// console.log("__im a tile", o);
+				removeClass(o,"lastMove");
+				return false; }
+			);
+			// console.log("clearMoves", $puz.getTiles());
+		};
 		
 		this.arrangement = function() {
-			var arr = this.cellAry().map(function(o,i){
+			var arr = this.getCells().map(function(o,i){
 				if (o.hasChildNodes()) {
 					return parseInt(o.firstChild.getAttribute("idx"));
 				} else {
@@ -78,7 +92,7 @@
 		}
 		
 		this.getBlankCell = function() {
-			var b = $puz.cellAry().filter(function(o, i){
+			var b = $puz.getCells().filter(function(o, i){
 				if (o.hasChildNodes()) {
 					removeClass(o,"blank");
 					return false;
@@ -92,7 +106,7 @@
 		
 		this.isSolved = function() { return this.correctTileOrder == this.arrangement() ? true : false; }
 		this.reset = function(e) { 
-			$puz.cellAry().map(function(o,i){
+			$puz.getCells().map(function(o,i){
 				if($puz.randomTiles[i]) {
 					var t = document.getElementById("tile"+$puz.randomTiles[i]);
 					o.appendChild(t);
@@ -113,6 +127,9 @@
 			$puz.getBlankCell().appendChild( e.target );
 			console.log("puz", $puz.arrangement());
 			// $puz.getBlankCell().getEligibleCells();
+			
+			$puz.clearMoves();
+			addClass(e.target, "lastMove");
 			
 			if( !$puz.isSolved() ) {
 				console.log(this, e.target, "not solved");
@@ -140,9 +157,9 @@
 			console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
 			var eligibles = $puz.getBlankCell().getEligibleCells();
 			
-			console.log( $puz.getCellByTileIdx(unsolvedIdx+1) );
+			console.log( "$puz.getCellByTileIdx(unsolvedIdx+1)", $puz.getCellByTileIdx(unsolvedIdx+1) );
 			var blankCell = $puz.getBlankCell();
-			var curTargetCell  = $puz.cellAry()[unsolvedIdx];
+			var curTargetCell  = $puz.getCells()[unsolvedIdx];
 			var curTargetTileCell = $puz.getCellByTileIdx(unsolvedIdx+1);
 			var mCell;
 			var mTile;
@@ -179,8 +196,8 @@
 				return a.dist - b.dist;
 				
 			});
-			var filElObjAry = elObjAry.filter(function(o, i){ return o.dist != 0 });
-			console.log(filElObjAry);
+			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && o.dist != 0; });
+			console.log("filElObjAry", filElObjAry);
 			mCell = filElObjAry[0].el;
 			mTile = mCell.firstChild;
 			console.log(mTile);
@@ -264,7 +281,7 @@
 		});
 		
 		_.getEligibleCells = function(){
-			var eligible = puz.cellAry().filter(function(o, i){
+			var eligible = puz.getCells().filter(function(o, i){
 				o.setAttribute("class","cell");
 				var eligibleHorz = (o.offsetLeft == _.X() - _.W() 
 					|| o.offsetLeft == _.X() + _.W())
