@@ -82,7 +82,7 @@
 			var sample = this.moveLog.slice(this.moveLog.length-3);
 			var sampleRE = new RegExp(sample, "g");
 			var captures = ml.match(sampleRE);
-			console.log( "moveCheck", sample, captures, captures.length > 2, ml );
+			//--console.log( "moveCheck", sample, captures, captures.length > 2, ml );
 			if (captures.length > 2) {
 				//alert("LOOP!");
 				//this.moveLog = [];
@@ -94,11 +94,11 @@
 		
 		this.clearMoves = function() {
 			var arr = $puz.getTiles().map(function(o,i){
-				// console.log("__im a tile", o);
+				// //--console.log("__im a tile", o);
 				removeClass(o,"lastMove");
 				return false; }
 			);
-			// console.log("clearMoves", $puz.getTiles());
+			// //--console.log("clearMoves", $puz.getTiles());
 		};
 		
 		this.arrangement = function() {
@@ -140,14 +140,14 @@
 		}
 		
 		this.animEnd = function(e) { 
-			console.log(e, e.type, e.target, e.currentTarget);
+			//--console.log(e, e.type, e.target, e.currentTarget);
 			e.target.removeEventListener("webkitTransitionEnd", $puz.animEnd);
 			
 			e.target.style.left = "auto";
 			e.target.style.top = "auto";
 			
 			$puz.getBlankCell().appendChild( e.target );
-			console.log("puz", $puz.arrangement());
+			//--console.log("puz", $puz.arrangement());
 			// $puz.getBlankCell().getEligibleCells();
 			
 			$puz.addMove(e.target.getAttribute("idx"));
@@ -155,7 +155,7 @@
 			addClass(e.target, "lastMove");
 			
 			if( !$puz.isSolved() ) {
-				console.log(this, e.target, "not solved");
+				//--console.log(this, e.target, "not solved");
 				// run the solve function again if not solved
 				_.addEventListener("solve", $puz.solve);
 				var e = document.createEvent("Event");
@@ -166,7 +166,7 @@
 		}
 		
 		this.solve = function(e) {
-			//console.log = function(s) { return null; }
+			////--console.log = function(s) { return null; }
 			addClass( $puz.el, "solving")
 			e.target.removeEventListener("solve", $puz.solve);
 			//find least numbered tile for targeting
@@ -174,17 +174,17 @@
 			var solvedAry = correctTileOrder.map(function(o, i){ return o == $puz.arrangement()[i] ? true : false; });
 			var unsolvedIdx = (function() {
 				for( var i=0; i < solvedAry.length; i++) {
-					console.log("solvedAry", i, solvedAry[i], solvedAry);
+					//--console.log("solvedAry", i, solvedAry[i], solvedAry);
 					if (solvedAry[i] == false) return i
 				};
 			})(solvedAry);
-			console.log("unsolvedIdx", unsolvedIdx);
+			//--console.log("unsolvedIdx", unsolvedIdx);
 			
 			//find blank
-			console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
+			//--console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
 			var eligibles = $puz.getBlankCell().getEligibleCells();
 			
-			console.log( "$puz.getCellByTileIdx(unsolvedIdx+1)", $puz.getCellByTileIdx(unsolvedIdx+1) );
+			//--console.log( "$puz.getCellByTileIdx(unsolvedIdx+1)", $puz.getCellByTileIdx(unsolvedIdx+1) );
 			var blankCell = $puz.getBlankCell();
 			var curTargetCell  = $puz.getCells()[unsolvedIdx];
 			var curTargetTileCell = $puz.getCellByTileIdx(unsolvedIdx+1);
@@ -192,8 +192,8 @@
 			var mCell;
 			var mTile;
 			var targetTile = curTargetTileCell.firstChild;
-			console.log("curTargetCell", curTargetCell);
-			console.log("curTargetTileCell", curTargetTileCell);
+			//--console.log("curTargetCell", curTargetCell);
+			//--console.log("curTargetTileCell", curTargetTileCell);
 			//find blank in relation to target
 			var distObj = { x: (blankCell.X() - curTargetTileCell.X()), y: (blankCell.Y() - curTargetTileCell.Y()), goalCellX: curTargetCell.X(), goalCellY: curTargetCell.Y() };
 			var nextEligibleCell = function(el,dir) {
@@ -201,17 +201,17 @@
 			};
 			
 			//if mTile is below blank
-			console.log(distObj);
-			console.log(eligibles);
+			//--console.log(distObj);
+			//--console.log(eligibles);
 			elObjAry = eligibles.map(function(o,i) {
 				var goalCellIdx = parseInt(o.firstChild.getAttribute("idx")) - 1;
-				console.log("goalCellIdx", goalCellIdx);
+				//--console.log("goalCellIdx", goalCellIdx);
 				var goalCell = $puz.getCell(goalCellIdx)
-				console.log("goalCell", goalCell);
+				//--console.log("goalCell", goalCell);
 				var distX = Math.abs(goalCell.X() - o.X());
 				var distY = Math.abs(goalCell.Y() - o.Y());
 				var totalDist = distX + distY;				
-				console.log(o, totalDist);
+				//--console.log(o, totalDist);
 				return { 
 					el: o,
 					dist: totalDist,
@@ -223,7 +223,7 @@
 			});
 			
 			elObjAry.sort(function (a, b) { 
-				console.log(a,b);
+				//--console.log(a,b);
 				//if two tiles has the same distance to travel
 				if (a.dist === b.dist) {
 					if (a.diagDiff === b.diagDiff) {
@@ -239,12 +239,12 @@
 				
 			});
 			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && !o.solved; });
-			console.log("filElObjAry", filElObjAry);
+			//--console.log("filElObjAry", filElObjAry);
 			$puz.moveCheck();
 			if( $puz.moveCheck() && filElObjAry.length > 1 ) filElObjAry = filElObjAry.slice(1);
 			mCell = filElObjAry[0].el;
 			mTile = mCell.firstChild;
-			console.log(mTile);
+			//--console.log(mTile);
 			
 			//move tile
 			mTile.style.left = blankCell.X() - mCell.X() + "px";
@@ -254,27 +254,27 @@
 			
 			// //if mTile is above blank
 			// if(distObj.x < 0 || distObj.y < 0) {
-			// 	console.log("Rule #1");
+			// 	//--console.log("Rule #1");
 			// 	mCell = eligibles[eligibles.length-1];
 			// 	mTile = mCell.firstChild;
 			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
 			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
 			// }
 			// else if (distObj.x > 0 || distObj.y > 0) {
-			// 	console.log("Rule #2");
+			// 	//--console.log("Rule #2");
 			// 	mCell = eligibles[0];
 			// 	mTile = mCell.firstChild;
 			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
 			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
 			// }
 			// else if ((distObj.x > 0 || distObj.y >= 0) && curTargetTileCell.hasClass("eligible")) {
-			// 	console.log("Rule #3");
+			// 	//--console.log("Rule #3");
 			// 	mCell = eligibles[1];
 			// 	mTile = mCell.firstChild;
 			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
 			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
 			// }
-			//console.log("mCell", mCell);
+			////--console.log("mCell", mCell);
 			//if target is left of blank
 			//if target is right of blank
 
@@ -285,11 +285,11 @@
 			//mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
 			
 			//check if target is in place
-			console.log("solve");
+			//--console.log("solve");
 			
-			console.log("solvedAry", solvedAry);
-			console.log(correctTileOrder);
-			console.log($puz.arrangement());
+			//--console.log("solvedAry", solvedAry);
+			//--console.log(correctTileOrder);
+			//--console.log($puz.arrangement());
 			
 		}
 		
@@ -307,7 +307,7 @@
 			}
 		}
 		
-		//console.log(this);
+		////--console.log(this);
 		this.init();
 	}
 
@@ -358,25 +358,25 @@
 		}
 		
 		var dropped = function(e){
-			console.log(e.type);
-			console.log(e);
+			//--console.log(e.type);
+			//--console.log(e);
 			e.target.removeEventListener("drop", dropped, true);
 			
 			var d = document.getElementById(e.dataTransfer.getData("Text"));
 			undraggable(d);
 			// d.style.left = "auto";
 			// d.style.top = "auto";
-			console.log(e.target)
-			console.log(e.currentTarget)
+			//--console.log(e.target)
+			//--console.log(e.currentTarget)
 
 			if ( e.target === e.currentTarget ) e.target.appendChild( d );
 			
-			console.log(puz.arrangement());
+			//--console.log(puz.arrangement());
 			return false;
 		};
 		
 		this.mouseDrag = function(e){
-			console.log(e.type);
+			//--console.log(e.type);
 			if ( e.type == "mouseout") return;
 			
 			e.target.parentNode.getEligibleCells();
@@ -388,7 +388,7 @@
 				if ( e.type == "mouseout") return;
 				
 				var cancel = function(e) {
-					//console.log(e.type);
+					////--console.log(e.type);
 					if (e.preventDefault) e.preventDefault();
 					return false;
 				}
@@ -397,8 +397,8 @@
 				// dragIcon.width = 100;
 				
 				this.addEventListener("dragstart", function(e){ 
-					console.log(e.type);
-					console.log(e);
+					//--console.log(e.type);
+					//--console.log(e);
 					
 					e.dataTransfer.effectAllowed = "move";
 					
@@ -407,7 +407,7 @@
 					// e.dataTransfer.setDragImage(dragIcon, e.clientX, e.clientY);					
 				});
 				this.addEventListener("drag", function(e){
-					console.log(e.type);
+					//--console.log(e.type);
 					addClass(e.srcElement, "dragging");
 					
 					// document.getElementById("debug").innerHTML = e.srcElement.offsetX + ", " + e.srcElement.offsetY;
@@ -417,19 +417,19 @@
 					// e.srcElement.style.display = "none";					
 					// e.srcElement.style.display = "block";
 					
-					//console.log(e.srcElement.style.display = none);
+					////--console.log(e.srcElement.style.display = none);
 				});
 				
 				this.addEventListener("dragend", function(e){ 
-					console.log(e.type);
-					console.log(e);
+					//--console.log(e.type);
+					//--console.log(e);
 					undraggable(e.target);
 					blankCell.removeEventListener("drop", dropped, true);
 				});
 				blankCell.addEventListener("dragover", cancel);
 				blankCell.addEventListener("dragenter", cancel);
-				console.log("blankCell");
-				console.log(blankCell);
+				//--console.log("blankCell");
+				//--console.log(blankCell);
 				blankCell.addEventListener("drop", dropped, true);
 			} else {
 				undraggable(e.target);
@@ -442,18 +442,18 @@
 		_.addEventListener("mouseover", this.mouseDrag);
 
 		var clickAnimEnd = function(e) {
-			console.log(e, e.type, e.target);
+			//--console.log(e, e.type, e.target);
 			e.target.removeEventListener("webkitTransitionEnd", clickAnimEnd, true);
 			
 			e.target.style.left = "auto";
 			e.target.style.top = "auto";
 			
 			puz.getBlankCell().appendChild( e.target );
-			console.log(puz.arrangement());
+			//--console.log(puz.arrangement());
 		}
 				
 		this.mouseClick = function(e){
-			console.log(e.type);
+			//--console.log(e.type);
 
 			if( hasClass(puz.getBlankCell(), "eligible") ) {
 				var blankCell = puz.getBlankCell();
