@@ -47,7 +47,7 @@
 		//Provided Array = [4, 8, 1, 14, 7, 2, 3, 0, 12, 5, 6, 11, 13, 9, 15]
 		this.correctTileOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false];
 		this.randomTiles = this.correctTileOrder.sort(function() {return 0.5 - Math.random()})
-		this.randomTiles = [1, 2, 8, 14, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
+		this.randomTiles = [1, 2, 14, 8, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
 		
 		_.setAttribute("class","puzzle");
 				
@@ -161,7 +161,7 @@
 				var e = document.createEvent("Event");
 				e.initEvent("solve", true, true);
 				var fireEvent = function(){ _.dispatchEvent(e); }
-				var wait = setTimeout(fireEvent, 100);
+				var wait = setTimeout(fireEvent, 50);
 			}
 		}
 		
@@ -176,9 +176,17 @@
 				for( var i=0; i < solvedAry.length; i++) {
 					//--console.log("solvedAry", i, solvedAry[i], solvedAry);
 					if (solvedAry[i] == false) return i
+					
+					//accounting for trick around corners
+					if (i == 2 || i == 6) {
+						if (solvedAry[i] == true && solvedAry[i+1] == false) {
+							solvedAry[i] = false;
+							return i;
+						}
+					}
 				};
 			})(solvedAry);
-			//--console.log("unsolvedIdx", unsolvedIdx);
+			console.log("unsolvedIdx", unsolvedIdx);
 			
 			//find blank
 			//--console.log( $puz.getBlankCell(), $puz.getBlankCell().offsetLeft, $puz.getBlankCell().offsetLeft );
@@ -189,19 +197,20 @@
 			var curTargetCell  = $puz.getCells()[unsolvedIdx];
 			var curTargetTileCell = $puz.getCellByTileIdx(unsolvedIdx+1);
 
+			// if(unsolvedIdx == 2 || unsolvedIdx == 6) {
+			// 	$puz.debug("we're at " + unsolvedIdx);
+			// 	var curTargetCell  = $puz.getCells()[unsolvedIdx+1];
+			// 	var curTargetTileCell = $puz.getCellByTileIdx(unsolvedIdx);
+			// }
+
 			var mCell;
 			var mTile;
 			var targetTile = curTargetTileCell.firstChild;
-			//--console.log("curTargetCell", curTargetCell);
-			//--console.log("curTargetTileCell", curTargetTileCell);
+			console.log("curTargetCell", curTargetCell);
+			console.log("curTargetTileCell", curTargetTileCell);
 			//find blank in relation to target
-			var distObj = { x: (blankCell.X() - curTargetTileCell.X()), y: (blankCell.Y() - curTargetTileCell.Y()), goalCellX: curTargetCell.X(), goalCellY: curTargetCell.Y() };
-			var nextEligibleCell = function(el,dir) {
-				
-			};
 			
 			//if mTile is below blank
-			//--console.log(distObj);
 			//--console.log(eligibles);
 			elObjAry = eligibles.map(function(o,i) {
 				var goalCellIdx = parseInt(o.firstChild.getAttribute("idx")) - 1;
@@ -239,7 +248,7 @@
 				
 			});
 			var filElObjAry = elObjAry.filter(function(o, i){ return !hasClass( o.el.firstChild, "lastMove") && !o.solved; });
-			//--console.log("filElObjAry", filElObjAry);
+			console.log("filElObjAry", filElObjAry);
 			$puz.moveCheck();
 			if( $puz.moveCheck() && filElObjAry.length > 1 ) filElObjAry = filElObjAry.slice(1);
 			mCell = filElObjAry[0].el;
@@ -251,38 +260,6 @@
 			mTile.style.top = blankCell.Y() - mCell.Y() + "px";
 			
 			mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
-			
-			// //if mTile is above blank
-			// if(distObj.x < 0 || distObj.y < 0) {
-			// 	//--console.log("Rule #1");
-			// 	mCell = eligibles[eligibles.length-1];
-			// 	mTile = mCell.firstChild;
-			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
-			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
-			// }
-			// else if (distObj.x > 0 || distObj.y > 0) {
-			// 	//--console.log("Rule #2");
-			// 	mCell = eligibles[0];
-			// 	mTile = mCell.firstChild;
-			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
-			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
-			// }
-			// else if ((distObj.x > 0 || distObj.y >= 0) && curTargetTileCell.hasClass("eligible")) {
-			// 	//--console.log("Rule #3");
-			// 	mCell = eligibles[1];
-			// 	mTile = mCell.firstChild;
-			// 	mTile.style.left = blankCell.X() - mCell.X() + "px";
-			// 	mTile.style.top = blankCell.Y() - mCell.Y() + "px";
-			// }
-			////--console.log("mCell", mCell);
-			//if target is left of blank
-			//if target is right of blank
-
-			//move tile
-			//targetTile.style.left = blankCell.X() - curTargetTileCell.X() + "px";
-			//targetTile.style.top = blankCell.Y() - curTargetTileCell.Y() + "px";
-			
-			//mTile.addEventListener("webkitTransitionEnd", $puz.animEnd);
 			
 			//check if target is in place
 			//--console.log("solve");
