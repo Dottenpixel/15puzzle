@@ -75,7 +75,10 @@
 		}
 		this.moveLog = [];
 		
-		this.addMove = function(idx) { this.moveLog.push(idx); };
+		this.addMove = function(idx) {
+			document.getElementById("inpMovesCount").value = $puz.moveLog.length;
+			this.moveLog.push(idx);
+		};
 		
 		this.moveCheck = function() {
 			var ml = this.moveLog.join(",");
