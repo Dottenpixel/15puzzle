@@ -47,7 +47,7 @@
 		//Provided Array = [4, 8, 1, 14, 7, 2, 3, 0, 12, 5, 6, 11, 13, 9, 15]
 		this.correctTileOrder = function() { return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,false]; }
 		this.randomTiles = this.correctTileOrder().sort(function() {return 0.5 - Math.random()})
-		//this.randomTiles = [1, 2, 14, 8, 7, 4, 3, 10, 12, 5, 6, 11, 13, 9, 15, false];
+		this.randomTiles = [4, 8, 1, 14, 7, 2, 3, 10, false, 12, 5, 6, 11, 13, 9, 15];
 		//--console.log($puz.correctTileOrder());
 		_.setAttribute("class","puzzle");
 				
@@ -129,10 +129,23 @@
 		}
 		
 		this.isSolved = function() { 
-			//--console.log( this.correctTileOrder(), this.arrangement() );
-			return this.correctTileOrder() == this.arrangement();
+			console.log( this.correctTileOrder(), this.arrangement() );
+			if (this.correctTileOrder().join(",") == this.arrangement().join(",")) {
+				//creates banner for when solved
+				var banner = document.createElement("div");
+				banner.id = "puzBanner";
+				banner.appendChild(document.createTextNode("SOLVED!"));
+				_.appendChild(banner);
+				addClass(banner, "banner");
+				
+				removeClass(this.el, "solving");
+				addClass(this.el, "solved");
+				return true;
+			};
+			return false;
 		 }
-		this.reset = function(e) { 
+		this.reset = function(e) {
+			$puz.el.removeChild(document.getElementById("puzBanner"));
 			$puz.getCells().map(function(o,i){
 				if($puz.randomTiles[i]) {
 					var t = document.getElementById("tile"+$puz.randomTiles[i]);
@@ -168,8 +181,6 @@
 				e.initEvent("solve", true, true);
 				var fireEvent = function(){ _.dispatchEvent(e); }
 				var wait = setTimeout(fireEvent, 50);
-			} else {
-				alert("Solved!");
 			}
 		}
 		
@@ -301,6 +312,7 @@
 				}
 				_.appendChild(cell.el);
 			}
+			
 		}
 		
 		////--console.log(this);
@@ -447,7 +459,8 @@
 			
 			puz.getBlankCell().appendChild( e.target );
 			puz.addMove();
-			//--console.log(puz.arrangement());
+			
+			puz.isSolved();
 		}
 				
 		this.mouseClick = function(e){
